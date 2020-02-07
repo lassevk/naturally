@@ -19,6 +19,8 @@ namespace Naturally.Tests
             yield return new TestCaseData(null, null, null, 0).SetName("null equals null");
             yield return new TestCaseData(null, "", null, -1).SetName("null before empty string");
             yield return new TestCaseData(null, "a", null, -1).SetName("null before a");
+
+            yield return new TestCaseData("a", "", null, +1).SetName("Empty string before a");
             
             yield return new TestCaseData("a", "a", null, 0).SetName("Lower-case a compares equal a");
             yield return new TestCaseData("a", "A", null, 0).SetName("Case-insensitive a equals A");
