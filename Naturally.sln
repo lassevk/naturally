@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Naturally", "Naturally\Naturally.csproj", "{064B5A5F-C238-49C5-9723-A6A1E02E6B1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Naturally.Tests", "Naturally.Tests\Naturally.Tests.csproj", "{14369143-C8DC-4724-8E7E-2DD1D6AF4289}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{064B5A5F-C238-49C5-9723-A6A1E02E6B1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{064B5A5F-C238-49C5-9723-A6A1E02E6B1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{064B5A5F-C238-49C5-9723-A6A1E02E6B1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{064B5A5F-C238-49C5-9723-A6A1E02E6B1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14369143-C8DC-4724-8E7E-2DD1D6AF4289}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14369143-C8DC-4724-8E7E-2DD1D6AF4289}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14369143-C8DC-4724-8E7E-2DD1D6AF4289}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14369143-C8DC-4724-8E7E-2DD1D6AF4289}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
