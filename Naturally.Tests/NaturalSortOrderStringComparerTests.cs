@@ -42,5 +42,19 @@ namespace Naturally.Tests
 
             Assert.That(output, Is.EqualTo(expected));
         }
+
+        [Test]
+        [TestCase("A10", "A10", 0)]
+        [TestCase("A10", "A00010", -1)]
+        [TestCase("A0010", "A010", +1)]
+        [TestCase("A10", "A01000", -1)]
+        public void Compare_CompoundStrings_ReturnsCorrectResults(string a, string b, int expected)
+        {
+            var comparer = new NaturalSortOrderStringComparer();
+
+            var output = comparer.Compare(a, b);
+
+            Assert.That(output, Is.EqualTo(expected));
+        }
     }
 }

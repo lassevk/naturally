@@ -85,7 +85,11 @@ namespace Naturally
                     return -1;
 
                 int restLength = Math.Min(x.Length, y.Length);
-                return _textStringComparer.Compare(x[^restLength..].ToString(), y[^restLength..].ToString());
+                int result = _textStringComparer.Compare(x[^restLength..].ToString(), y[^restLength..].ToString());
+                if (result != 0)
+                    return result;
+
+                return x.Length.CompareTo(y.Length);
             }
 
             return _textStringComparer.Compare(x.ToString(), y.ToString());
