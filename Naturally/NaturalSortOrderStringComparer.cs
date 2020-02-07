@@ -1,12 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Naturally
 {
     public class NaturalSortOrderStringComparer : StringComparer
     {
-        private static readonly Dictionary<char, int> _DigitOrder = new Dictionary<char, int>();
+        private static readonly Dictionary<char, double> _DigitValue = new Dictionary<char, double>()
+        {
+            ['\u00bd'] = 1.0 / 2.0,
+            ['\u2153'] = 1.0 / 3.0,
+            ['\u2154'] = 2.0 / 3.0,
+            ['\u00bc'] = 1.0 / 4.0,
+            ['\u00be'] = 3.0 / 4.0,
+            ['\u2155'] = 1.0 / 5.0,
+            ['\u2156'] = 2.0 / 5.0,
+            ['\u2157'] = 3.0 / 5.0,
+            ['\u2158'] = 4.0 / 5.0,
+            ['\u2159'] = 1.0 / 6.0,
+            ['\u215a'] = 5.0 / 6.0,
+            ['\u2150'] = 1.0 / 7.0,
+            ['\u215b'] = 1.0 / 8.0,
+            ['\u215c'] = 3.0 / 8.0,
+            ['\u215d'] = 5.0 / 8.0,
+            ['\u215e'] = 7.0 / 8.0,
+            ['\u2151'] = 1.0 / 9.0,
+            ['\u2152'] = 1.0 / 10.0,
+            ['\u2189'] = 0.0 / 3.0
+        };
         private static readonly Dictionary<(SectionCategory x, SectionCategory y), int> _SectionDifferencesResults =
             new Dictionary<(SectionCategory x, SectionCategory y), int>
             {
@@ -53,32 +75,9 @@ namespace Naturally
                         throw new InvalidOperationException($"{x}-{y} missing from section category results");
                 }
 
-            char[] digits =
-            {
-                '0',
-                '\u2189', // 0/3  = 0
-                '\u2152', // 1/10 = 0.1
-                '\u2151', // 1/9  = 0.111
-                '\u215b', // 1/8  = 0.125
-                '\u2150', // 1/7  = 0.142
-                '\u2159', // 1/6  = 0.166
-                '\u2155', // 1/5  = 0.2
-                '\u00bc', // 1/4  = 0.25
-                '\u2153', // 1/3  = 0.333
-                '\u215c', // 3/8  = 0.375
-                '\u2156', // 2/5  = 0.4
-                '\u00bd', // 1/2  = 0.5
-                '\u2157', // 3/5  = 0.6
-                '\u215d', // 5/8  = 0.625
-                '\u2154', // 2/3  = 0.666
-                '\u00be', // 3/4  = 0.75
-                '\u2158', // 4/5  = 0.8
-                '\u215a', // 5/6  = 0.833
-                '\u215e', // 7/8  = 0.875
-                '1', '2', '3', '4', '5', '6', '7', '8', '9'
-            };
-            for (int index = 0; index < digits.Length; index++)
-                _DigitOrder[digits[index]] = index;
+            IEnumerable<char> digits = Enumerable.Range(0, 65536).Select(i => (char)i).Where(Char.IsDigit);
+            foreach (var digit in digits)
+                _DigitValue[digit] = Char.GetNumericValue(digit);
         }
 
         private readonly StringComparer _TextStringComparer;
@@ -233,15 +232,16 @@ namespace Naturally
 
                 ReadOnlySpan<char> xNumber = x[^restLength..];
                 ReadOnlySpan<char> yNumber = y[^restLength..];
-                for (int index = 0; index < restLength; index++)
+                for (var index = 0; index < restLength; index++)
                 {
-                    if (!_DigitOrder.TryGetValue(xNumber[index], out var xOrder))
+                    if (!_DigitValue.TryGetValue(xNumber[index], out var xValue))
                         throw new InvalidOperationException($"Internal error, unknown digit '{xNumber[index]}'");
-                    if (!_DigitOrder.TryGetValue(yNumber[index], out var yOrder))
+                    if (!_DigitValue.TryGetValue(yNumber[index], out var yValue))
                         throw new InvalidOperationException($"Internal error, unknown digit '{yNumber[index]}'");
 
-                    if (xOrder != yOrder)
-                        return xOrder.CompareTo(yOrder);
+                    var result = xValue.CompareTo(yValue);
+                    if (result != 0)
+                        return result;
                 }
 
                 return 0;
@@ -254,10 +254,11 @@ namespace Naturally
         {
             foreach (var digit in number)
             {
-                if (!_DigitOrder.TryGetValue(digit, out var order))
+                if (!_DigitValue.TryGetValue(digit, out var order))
                     throw new InvalidOperationException($"Internal error, unknown digit '{digit}'");
                 
-                if (order != 0)
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                if (order != 0.0)
                     return true;
             }
 
@@ -287,7 +288,7 @@ namespace Naturally
 
         private static SectionCategory Categorize(char c)
         {
-            if (_DigitOrder.ContainsKey(c))
+            if (_DigitValue.ContainsKey(c))
                 return SectionCategory.Number;
 
             if (Char.IsWhiteSpace(c))
