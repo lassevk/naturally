@@ -48,6 +48,7 @@ namespace Naturally.Tests
         [TestCase("A10", "A00010", -1)]
         [TestCase("A0010", "A010", +1)]
         [TestCase("A10", "A01000", -1)]
+        [TestCase("A10B20", "A010B19", +1)]
         public void Compare_CompoundStrings_ReturnsCorrectResults(string a, string b, int expected)
         {
             var comparer = new NaturalSortOrderStringComparer();

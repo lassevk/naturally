@@ -6,11 +6,11 @@ namespace Naturally
 {
     public class NaturalSortOrderStringComparer : StringComparer
     {
-        private readonly StringComparer _textStringComparer;
+        private readonly StringComparer _TextStringComparer;
 
         public NaturalSortOrderStringComparer(StringComparer textStringComparer = null)
         {
-            _textStringComparer = textStringComparer ?? CurrentCultureIgnoreCase;
+            _TextStringComparer = textStringComparer ?? CurrentCultureIgnoreCase;
         }
 
         public override bool Equals(string x, string y) => Compare(x, y) == 0;
@@ -33,10 +33,7 @@ namespace Naturally
 
         private int CompareSection(ReadOnlySpan<char> xs, ReadOnlySpan<char> ys)
         {
-            ReadOnlySpan<char> xSection;
-            ReadOnlySpan<char> ySection;
-            bool xSectionIsNumeric;
-            bool ySectionIsNumeric;
+            int? sortOrderBecauseOfNumericLength = null;
             
             while (xs.Length > 0 || ys.Length > 0)
             {
@@ -44,13 +41,17 @@ namespace Naturally
                 int xLoopLength = xs.Length;
                 int yLoopLength = ys.Length;
 #endif
-                
-                xs = MoveNext(xs, out xSection, out xSectionIsNumeric);
-                ys = MoveNext(ys, out ySection, out ySectionIsNumeric);
+
+                xs = MoveNext(xs, out ReadOnlySpan<char> xSection, out var xSectionIsNumeric);
+                ys = MoveNext(ys, out ReadOnlySpan<char> ySection, out var ySectionIsNumeric);
 
                 int sectionComparisonResult;
                 if (xSectionIsNumeric && ySectionIsNumeric)
+                {
                     sectionComparisonResult = CompareNumericSections(xSection, ySection);
+                    if (!sortOrderBecauseOfNumericLength.HasValue && sectionComparisonResult == 0 && xSection.Length != ySection.Length)
+                        sortOrderBecauseOfNumericLength = xSection.Length.CompareTo(ySection.Length);
+                }
                 else if (xSectionIsNumeric)
                     sectionComparisonResult = +1;
                 else if (ySectionIsNumeric)
@@ -67,10 +68,10 @@ namespace Naturally
 #endif
             }
 
-            return 0;
+            return sortOrderBecauseOfNumericLength ?? 0;
         }
 
-        private int CompareTextSections(in ReadOnlySpan<char> x, in ReadOnlySpan<char> y) => _textStringComparer.Compare(x.ToString(), y.ToString());
+        private int CompareTextSections(in ReadOnlySpan<char> x, in ReadOnlySpan<char> y) => _TextStringComparer.Compare(x.ToString(), y.ToString());
 
         private int CompareNumericSections(in ReadOnlySpan<char> x, in ReadOnlySpan<char> y)
         {
@@ -85,14 +86,10 @@ namespace Naturally
                     return -1;
 
                 int restLength = Math.Min(x.Length, y.Length);
-                int result = _textStringComparer.Compare(x[^restLength..].ToString(), y[^restLength..].ToString());
-                if (result != 0)
-                    return result;
-
-                return x.Length.CompareTo(y.Length);
+                return _TextStringComparer.Compare(x[^restLength..].ToString(), y[^restLength..].ToString());
             }
 
-            return _textStringComparer.Compare(x.ToString(), y.ToString());
+            return _TextStringComparer.Compare(x.ToString(), y.ToString());
         }
 
         private bool IsNonZero(ReadOnlySpan<char> number)
