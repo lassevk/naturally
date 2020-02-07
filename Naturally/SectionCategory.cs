@@ -5,6 +5,7 @@
         Empty,
         Whitespace,
         Text,
-        Number
+        Number,
+        Punctuation
     }
 }

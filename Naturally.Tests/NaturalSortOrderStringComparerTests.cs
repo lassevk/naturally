@@ -16,6 +16,10 @@ namespace Naturally.Tests
 
         public static IEnumerable<TestCaseData> Compare_TestCases()
         {
+            yield return new TestCaseData(null, null, null, 0).SetName("null equals null");
+            yield return new TestCaseData(null, "", null, -1).SetName("null before empty string");
+            yield return new TestCaseData(null, "a", null, -1).SetName("null before a");
+            
             yield return new TestCaseData("a", "a", null, 0).SetName("Lower-case a compares equal a");
             yield return new TestCaseData("a", "A", null, 0).SetName("Case-insensitive a equals A");
             yield return new TestCaseData("a", "A", StringComparer.InvariantCulture, -1).SetName("Not case sensitive a before A");
@@ -43,6 +47,9 @@ namespace Naturally.Tests
             yield return new TestCaseData("\u00bd", "0", null, +1).SetName("1/2 after 0");
             yield return new TestCaseData("\u2153", "0", null, +1).SetName("1/3 after 0");
             yield return new TestCaseData("\u215d", "\u2158", null, -1).SetName("5/8 before 4/5");
+
+            yield return new TestCaseData("Test1", "Test", null, +1).SetName("Text without number before text with");
+            yield return new TestCaseData("Test1.txt", "Test.txt", null, +1).SetName("Text without number before text with (.txt)");
         }
 
         [TestCaseSource(nameof(Compare_TestCases))]

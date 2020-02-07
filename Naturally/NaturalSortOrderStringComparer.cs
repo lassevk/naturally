@@ -35,11 +35,16 @@ namespace Naturally
                 [(SectionCategory.Empty, SectionCategory.Number)] = -1, // number after nothing
                 [(SectionCategory.Empty, SectionCategory.Text)] = -1, // text after nothing
                 [(SectionCategory.Empty, SectionCategory.Whitespace)] = -1, // whitespace after nothing
+                [(SectionCategory.Empty, SectionCategory.Punctuation)] = -1, // punctuation after nothing
                 
-                [(SectionCategory.Number, SectionCategory.Text)] = +1, // text without number before text with 
+                [(SectionCategory.Number, SectionCategory.Text)] = -1, // number before text 
                 [(SectionCategory.Number, SectionCategory.Whitespace)] = +1, // whitespace before number
+                [(SectionCategory.Number, SectionCategory.Punctuation)] = +1, // number after punctuation
                 
                 [(SectionCategory.Text, SectionCategory.Whitespace)] = +1, // whitespace before text
+                [(SectionCategory.Text, SectionCategory.Punctuation)] = -1, // text before punctuation
+                
+                [(SectionCategory.Whitespace, SectionCategory.Punctuation)] = +1, // punctuation before whitespace
             };
 
         static NaturalSortOrderStringComparer()
@@ -179,6 +184,7 @@ namespace Naturally
                             break;
 
                         case SectionCategory.Text:
+                        case SectionCategory.Punctuation:
                             var textComparisonResult = CompareTextSections(xSection, ySection);
                             if (textComparisonResult != 0)
                                 return textComparisonResult;
@@ -198,11 +204,9 @@ namespace Naturally
                 }
                 else
                 {
-                    if (xSectionCategory == SectionCategory.Empty)
-                        sortOrderBecauseOfNumericLengthOrLeadingOrTrailingSpaces ??= +1;
-                    else if (ySectionCategory == SectionCategory.Empty)
-                        sortOrderBecauseOfNumericLengthOrLeadingOrTrailingSpaces ??= -1;
-                    
+                    if (_SectionDifferencesResults.TryGetValue((xSectionCategory, ySectionCategory), out var sectionResult))
+                        if (sectionResult != 0)
+                            return sectionResult;
                 }
 
 #if DEBUG
@@ -293,6 +297,9 @@ namespace Naturally
 
             if (Char.IsWhiteSpace(c))
                 return SectionCategory.Whitespace;
+
+            if (Char.IsPunctuation(c))
+                return SectionCategory.Punctuation;
 
             return SectionCategory.Text;
         }
