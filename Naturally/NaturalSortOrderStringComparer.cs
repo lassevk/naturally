@@ -6,6 +6,7 @@ namespace Naturally
 {
     public class NaturalSortOrderStringComparer : StringComparer
     {
+        private static readonly Dictionary<char, int> _DigitOrder = new Dictionary<char, int>();
         private static readonly Dictionary<(SectionCategory x, SectionCategory y), int> _SectionDifferencesResults =
             new Dictionary<(SectionCategory x, SectionCategory y), int>
             {
@@ -51,6 +52,33 @@ namespace Naturally
                     if (!_SectionDifferencesResults.TryGetValue((x, y), out _))
                         throw new InvalidOperationException($"{x}-{y} missing from section category results");
                 }
+
+            char[] digits =
+            {
+                '0',
+                '\u2189', // 0/3  = 0
+                '\u2152', // 1/10 = 0.1
+                '\u2151', // 1/9  = 0.111
+                '\u215b', // 1/8  = 0.125
+                '\u2150', // 1/7  = 0.142
+                '\u2159', // 1/6  = 0.166
+                '\u2155', // 1/5  = 0.2
+                '\u00bc', // 1/4  = 0.25
+                '\u2153', // 1/3  = 0.333
+                '\u215c', // 3/8  = 0.375
+                '\u2156', // 2/5  = 0.4
+                '\u00bd', // 1/2  = 0.5
+                '\u2157', // 3/5  = 0.6
+                '\u215d', // 5/8  = 0.625
+                '\u2154', // 2/3  = 0.666
+                '\u00be', // 3/4  = 0.75
+                '\u2158', // 4/5  = 0.8
+                '\u215a', // 5/6  = 0.833
+                '\u215e', // 7/8  = 0.875
+                '1', '2', '3', '4', '5', '6', '7', '8', '9'
+            };
+            for (int index = 0; index < digits.Length; index++)
+                _DigitOrder[digits[index]] = index;
         }
 
         private readonly StringComparer _TextStringComparer;
@@ -202,7 +230,21 @@ namespace Naturally
                     return -1;
 
                 var restLength = Math.Min(x.Length, y.Length);
-                return _TextStringComparer.Compare(x[^restLength..].ToString(), y[^restLength..].ToString());
+
+                ReadOnlySpan<char> xNumber = x[^restLength..];
+                ReadOnlySpan<char> yNumber = y[^restLength..];
+                for (int index = 0; index < restLength; index++)
+                {
+                    if (!_DigitOrder.TryGetValue(xNumber[index], out var xOrder))
+                        throw new InvalidOperationException($"Internal error, unknown digit '{xNumber[index]}'");
+                    if (!_DigitOrder.TryGetValue(yNumber[index], out var yOrder))
+                        throw new InvalidOperationException($"Internal error, unknown digit '{yNumber[index]}'");
+
+                    if (xOrder != yOrder)
+                        return xOrder.CompareTo(yOrder);
+                }
+
+                return 0;
             }
 
             return _TextStringComparer.Compare(x.ToString(), y.ToString());
@@ -211,8 +253,13 @@ namespace Naturally
         private bool IsNonZero(ReadOnlySpan<char> number)
         {
             foreach (var digit in number)
-                if (digit != '0')
+            {
+                if (!_DigitOrder.TryGetValue(digit, out var order))
+                    throw new InvalidOperationException($"Internal error, unknown digit '{digit}'");
+                
+                if (order != 0)
                     return true;
+            }
 
             return false;
         }
@@ -240,7 +287,7 @@ namespace Naturally
 
         private static SectionCategory Categorize(char c)
         {
-            if (Char.IsDigit(c))
+            if (_DigitOrder.ContainsKey(c))
                 return SectionCategory.Number;
 
             if (Char.IsWhiteSpace(c))

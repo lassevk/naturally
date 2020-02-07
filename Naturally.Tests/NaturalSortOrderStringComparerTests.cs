@@ -39,6 +39,10 @@ namespace Naturally.Tests
 
             yield return new TestCaseData("a b", "a  b", null, -1).SetName("Amount of whitespaces matter");
             yield return new TestCaseData("a b", "a  a", null, +1).SetName("Amount of whitespaces does not matter if other more important rules kick in first");
+
+            yield return new TestCaseData("\u00bd", "0", null, +1).SetName("1/2 after 0");
+            yield return new TestCaseData("\u2153", "0", null, +1).SetName("1/3 after 0");
+            yield return new TestCaseData("\u215d", "\u2158", null, -1).SetName("5/8 before 4/5");
         }
 
         [TestCaseSource(nameof(Compare_TestCases))]
