@@ -92,12 +92,12 @@ namespace Naturally
 
         public override int Compare(string x, string y)
         {
-            // if (ReferenceEquals(x, y))
-            //     return 0;
-            // if (x == null)
-            //     return -1;
-            // if (y == null)
-            //     return +1;
+            if (ReferenceEquals(x, y))
+                return 0;
+            if (x == null)
+                return -1;
+            if (y == null)
+                return +1;
             
             ReadOnlySpan<char> xs = x.AsSpan();
             ReadOnlySpan<char> ys = y.AsSpan();
