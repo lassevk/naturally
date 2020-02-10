@@ -6,28 +6,8 @@ namespace Naturally
 {
     public class NaturalSortOrderStringComparer : StringComparer
     {
-        private static readonly Dictionary<char, double> _DigitValue = new Dictionary<char, double>()
-        {
-            ['\u00bd'] = 1.0 / 2.0,
-            ['\u2153'] = 1.0 / 3.0,
-            ['\u2154'] = 2.0 / 3.0,
-            ['\u00bc'] = 1.0 / 4.0,
-            ['\u00be'] = 3.0 / 4.0,
-            ['\u2155'] = 1.0 / 5.0,
-            ['\u2156'] = 2.0 / 5.0,
-            ['\u2157'] = 3.0 / 5.0,
-            ['\u2158'] = 4.0 / 5.0,
-            ['\u2159'] = 1.0 / 6.0,
-            ['\u215a'] = 5.0 / 6.0,
-            ['\u2150'] = 1.0 / 7.0,
-            ['\u215b'] = 1.0 / 8.0,
-            ['\u215c'] = 3.0 / 8.0,
-            ['\u215d'] = 5.0 / 8.0,
-            ['\u215e'] = 7.0 / 8.0,
-            ['\u2151'] = 1.0 / 9.0,
-            ['\u2152'] = 1.0 / 10.0,
-            ['\u2189'] = 0.0 / 3.0
-        };
+        private static readonly Dictionary<char, double> _DigitValue = new Dictionary<char, double>();
+
         private static readonly Dictionary<(SectionCategory x, SectionCategory y), int> _SectionDifferencesResults =
             new Dictionary<(SectionCategory x, SectionCategory y), int>
             {
@@ -79,9 +59,14 @@ namespace Naturally
                         throw new InvalidOperationException($"{x}-{y} missing from section category results");
                 }
 
-            IEnumerable<char> digits = Enumerable.Range(0, 65536).Select(i => (char)i).Where(Char.IsDigit);
+            IEnumerable<char> digits = Enumerable.Range(0, 65536).Select(i => (char)i);
             foreach (var digit in digits)
-                _DigitValue[digit] = Char.GetNumericValue(digit);
+            {
+                var numericValue = Char.GetNumericValue(digit);
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                if (numericValue != -1)
+                    _DigitValue[digit] = numericValue;
+            }
         }
 
         private readonly StringComparer _TextStringComparer;
