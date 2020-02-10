@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Naturally
 {
@@ -28,61 +26,6 @@ namespace Naturally
         
         #endregion
         
-        private static readonly Dictionary<(SectionCategory x, SectionCategory y), int> _SectionDifferencesResults =
-            new Dictionary<(SectionCategory x, SectionCategory y), int>
-            {
-                [(SectionCategory.Empty, SectionCategory.Number)] = -1, // number after nothing
-                [(SectionCategory.Empty, SectionCategory.Text)] = -1, // text after nothing
-                [(SectionCategory.Empty, SectionCategory.Whitespace)] = -1, // whitespace after nothing
-                [(SectionCategory.Empty, SectionCategory.Punctuation)] = -1, // punctuation after nothing
-
-                [(SectionCategory.Number, SectionCategory.Text)] = -1, // number before text 
-                [(SectionCategory.Number, SectionCategory.Whitespace)] = -1, // number before whitespace
-                [(SectionCategory.Number, SectionCategory.Punctuation)] = +1, // number after punctuation
-
-                [(SectionCategory.Text, SectionCategory.Whitespace)] = +1, // whitespace before text
-                [(SectionCategory.Text, SectionCategory.Punctuation)] = -1, // text before punctuation
-
-                [(SectionCategory.Whitespace, SectionCategory.Punctuation)] = +1, // punctuation before whitespace
-            };
-        
-        static NaturalSortOrderStringComparer()
-        {
-            SectionCategory[] categories = Enum.GetValues(typeof(SectionCategory)).OfType<SectionCategory>().ToArray();
-            var additions = new List<(SectionCategory x, SectionCategory y, int result)>();
-
-            foreach (SectionCategory x in categories)
-                foreach (SectionCategory y in categories)
-                {
-                    if (x == y)
-                        continue;
-
-                    if (_SectionDifferencesResults.TryGetValue((x, y), out var result))
-                    {
-                        if (_SectionDifferencesResults.TryGetValue((y, x), out _))
-                            throw new InvalidOperationException($"Both {x}-{y} and {y}-{x} defined in internal dictionary");
-
-                        additions.Add((y, x, -result));
-                    }
-                }
-
-            foreach ((SectionCategory x, SectionCategory y, int result) addition in additions)
-                _SectionDifferencesResults.Add((addition.x, addition.y), addition.result);
-
-#if DEBUG
-            foreach (SectionCategory x in categories)
-                foreach (SectionCategory y in categories)
-                {
-                    if (x == y)
-                        continue;
-
-                    if (!_SectionDifferencesResults.TryGetValue((x, y), out _))
-                        throw new InvalidOperationException($"{x}-{y} missing from section category results");
-                }
-            
-#endif
-        }
-
         private readonly StringComparison _StringComparison;
 
         public NaturalSortOrderStringComparer(StringComparison stringComparison = StringComparison.CurrentCultureIgnoreCase)
@@ -178,7 +121,7 @@ namespace Naturally
                     if (xNextSectionCategory == SectionCategory.Number)
                     {
                         sortOrderBecauseOfNumericLengthOrLeadingOrTrailingSpaces ??=
-                            _SectionDifferencesResults[(SectionCategory.Whitespace, SectionCategory.Number)];
+                            SectionCategory.Whitespace.CompareTo(SectionCategory.Number);
 
                         xs = nextXs;
                         xSection = xNextSection;
@@ -192,7 +135,7 @@ namespace Naturally
                     if (yNextSectionCategory == SectionCategory.Number)
                     {
                         sortOrderBecauseOfNumericLengthOrLeadingOrTrailingSpaces ??=
-                            _SectionDifferencesResults[(SectionCategory.Number, SectionCategory.Whitespace)];
+                            SectionCategory.Number.CompareTo(SectionCategory.Whitespace);
 
                         ys = nextYs;
                         ySection = yNextSection;
@@ -233,9 +176,7 @@ namespace Naturally
                 }
                 else
                 {
-                    if (_SectionDifferencesResults.TryGetValue((xSectionCategory, ySectionCategory), out var sectionResult))
-                        if (sectionResult != 0)
-                            return sectionResult;
+                    return xSectionCategory.CompareTo(ySectionCategory);
                 }
 
 #if DEBUG

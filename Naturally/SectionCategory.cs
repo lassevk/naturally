@@ -3,9 +3,9 @@
     internal enum SectionCategory
     {
         Empty,
-        Whitespace,
-        Text,
+        Punctuation,
         Number,
-        Punctuation
+        Text,
+        Whitespace
     }
 }
