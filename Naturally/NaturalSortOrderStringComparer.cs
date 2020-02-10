@@ -6,23 +6,27 @@ namespace Naturally
 {
     public class NaturalSortOrderStringComparer : StringComparer
     {
-        public static new readonly StringComparer CurrentCulture =
-            new NaturalSortOrderStringComparer(StringComparer.CurrentCulture);
-
         public static new readonly StringComparer CurrentCultureIgnoreCase =
-            new NaturalSortOrderStringComparer(StringComparer.CurrentCultureIgnoreCase);
+            new NaturalSortOrderStringComparer(StringComparison.CurrentCultureIgnoreCase);
 
         public static new readonly StringComparer InvariantCultureIgnoreCase =
-            new NaturalSortOrderStringComparer(StringComparer.InvariantCultureIgnoreCase);
+            new NaturalSortOrderStringComparer(StringComparison.InvariantCultureIgnoreCase);
+
+        #region These added just to make sure NaturalSortOrderStringComparer.XYZ produces the expected results
+        
+        public static new readonly StringComparer CurrentCulture =
+            new NaturalSortOrderStringComparer(StringComparison.CurrentCulture);
 
         public static new readonly StringComparer InvariantCulture =
-            new NaturalSortOrderStringComparer(StringComparer.InvariantCulture);
+            new NaturalSortOrderStringComparer(StringComparison.InvariantCulture);
         
         public static new readonly StringComparer Ordinal =
-            new NaturalSortOrderStringComparer(StringComparer.Ordinal);
+            new NaturalSortOrderStringComparer(StringComparison.Ordinal);
         
         public static new readonly StringComparer OrdinalIgnoreCase =
-            new NaturalSortOrderStringComparer(StringComparer.OrdinalIgnoreCase);
+            new NaturalSortOrderStringComparer(StringComparison.OrdinalIgnoreCase);
+        
+        #endregion
         
         private static readonly Dictionary<char, double> _DigitValue = new Dictionary<char, double>();
 
@@ -43,7 +47,7 @@ namespace Naturally
 
                 [(SectionCategory.Whitespace, SectionCategory.Punctuation)] = +1, // punctuation before whitespace
             };
-
+        
         static NaturalSortOrderStringComparer()
         {
             SectionCategory[] categories = Enum.GetValues(typeof(SectionCategory)).OfType<SectionCategory>().ToArray();
@@ -88,11 +92,11 @@ namespace Naturally
             }
         }
 
-        private readonly StringComparer _TextStringComparer;
+        private readonly StringComparison _StringComparison;
 
-        public NaturalSortOrderStringComparer(StringComparer textStringComparer = null)
+        public NaturalSortOrderStringComparer(StringComparison stringComparison = StringComparison.CurrentCultureIgnoreCase)
         {
-            _TextStringComparer = textStringComparer ?? CurrentCultureIgnoreCase;
+            _StringComparison = stringComparison;
         }
 
         public override bool Equals(string x, string y) => Compare(x, y) == 0;
@@ -199,7 +203,6 @@ namespace Naturally
                         sortOrderBecauseOfNumericLengthOrLeadingOrTrailingSpaces ??=
                             _SectionDifferencesResults[(SectionCategory.Number, SectionCategory.Whitespace)];
 
-                        ;
                         ys = nextYs;
                         ySection = yNextSection;
                         ySectionCategory = yNextSectionCategory;
@@ -253,8 +256,7 @@ namespace Naturally
             return sortOrderBecauseOfNumericLengthOrLeadingOrTrailingSpaces ?? 0;
         }
 
-        private int CompareTextSections(in ReadOnlySpan<char> x, in ReadOnlySpan<char> y)
-            => _TextStringComparer.Compare(x.ToString(), y.ToString());
+        private int CompareTextSections(in ReadOnlySpan<char> x, in ReadOnlySpan<char> y) => x.CompareTo(y, _StringComparison);
 
         private int CompareNumericSections(in ReadOnlySpan<char> x, in ReadOnlySpan<char> y)
         {
@@ -288,7 +290,7 @@ namespace Naturally
                 return 0;
             }
 
-            return _TextStringComparer.Compare(x.ToString(), y.ToString());
+            return x.CompareTo(y, _StringComparison);
         }
 
         private bool IsNonZero(ReadOnlySpan<char> number)
