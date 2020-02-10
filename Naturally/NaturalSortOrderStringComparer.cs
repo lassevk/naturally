@@ -28,8 +28,6 @@ namespace Naturally
         
         #endregion
         
-        private static readonly Dictionary<char, double> _DigitValue = new Dictionary<char, double>();
-
         private static readonly Dictionary<(SectionCategory x, SectionCategory y), int> _SectionDifferencesResults =
             new Dictionary<(SectionCategory x, SectionCategory y), int>
             {
@@ -71,6 +69,7 @@ namespace Naturally
             foreach ((SectionCategory x, SectionCategory y, int result) addition in additions)
                 _SectionDifferencesResults.Add((addition.x, addition.y), addition.result);
 
+#if DEBUG
             foreach (SectionCategory x in categories)
                 foreach (SectionCategory y in categories)
                 {
@@ -80,16 +79,8 @@ namespace Naturally
                     if (!_SectionDifferencesResults.TryGetValue((x, y), out _))
                         throw new InvalidOperationException($"{x}-{y} missing from section category results");
                 }
-
-            IEnumerable<char> digits = Enumerable.Range(0, 65536).Select(i => (char)i);
-            foreach (var digit in digits)
-            {
-                var numericValue = Char.GetNumericValue(digit);
-
-                // ReSharper disable once CompareOfFloatsByEqualityOperator
-                if (numericValue != -1)
-                    _DigitValue[digit] = numericValue;
-            }
+            
+#endif
         }
 
         private readonly StringComparison _StringComparison;
@@ -276,10 +267,10 @@ namespace Naturally
                 ReadOnlySpan<char> yNumber = y[^restLength..];
                 for (var index = 0; index < restLength; index++)
                 {
-                    if (!_DigitValue.TryGetValue(xNumber[index], out var xValue))
+                    if (!NaturalSortOrderTables.NumericValues.TryGetValue(xNumber[index], out var xValue))
                         throw new InvalidOperationException($"Internal error, unknown digit '{xNumber[index]}'");
 
-                    if (!_DigitValue.TryGetValue(yNumber[index], out var yValue))
+                    if (!NaturalSortOrderTables.NumericValues.TryGetValue(yNumber[index], out var yValue))
                         throw new InvalidOperationException($"Internal error, unknown digit '{yNumber[index]}'");
 
                     var result = xValue.CompareTo(yValue);
@@ -297,11 +288,10 @@ namespace Naturally
         {
             foreach (var digit in number)
             {
-                if (!_DigitValue.TryGetValue(digit, out var order))
-                    throw new InvalidOperationException($"Internal error, unknown digit '{digit}'");
+                NaturalSortOrderTables.NumericValues.TryGetValue(digit, out var value);
 
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
-                if (order != 0.0)
+                if (value != 0.0)
                     return true;
             }
 
@@ -331,7 +321,7 @@ namespace Naturally
 
         private static SectionCategory Categorize(char c)
         {
-            if (_DigitValue.ContainsKey(c))
+            if (NaturalSortOrderTables.NumericValues.ContainsKey(c))
                 return SectionCategory.Number;
 
             if (Char.IsWhiteSpace(c))
