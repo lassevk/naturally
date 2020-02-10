@@ -52,6 +52,10 @@ namespace Naturally.Tests
 
             yield return new TestCaseData("Test1", "Test", null, +1).SetName("Text without number before text with");
             yield return new TestCaseData("Test1.txt", "Test.txt", null, +1).SetName("Text without number before text with (.txt)");
+
+            yield return new TestCaseData("A11", "A 10", null, +1).SetName("Ignore whitespace before numbers if numbers make a difference #1");
+            yield return new TestCaseData("A10", "A 11", null, -1).SetName("Ignore whitespace before numbers if numbers make a difference #2");
+            yield return new TestCaseData("A10", "A 10", null, -1).SetName("Do not ignore whitespace before numbers when numbers don't make a difference");
         }
 
         [TestCaseSource(nameof(Compare_TestCases))]

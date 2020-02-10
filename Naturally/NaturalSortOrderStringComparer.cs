@@ -15,14 +15,14 @@ namespace Naturally
                 [(SectionCategory.Empty, SectionCategory.Text)] = -1, // text after nothing
                 [(SectionCategory.Empty, SectionCategory.Whitespace)] = -1, // whitespace after nothing
                 [(SectionCategory.Empty, SectionCategory.Punctuation)] = -1, // punctuation after nothing
-                
+
                 [(SectionCategory.Number, SectionCategory.Text)] = -1, // number before text 
-                [(SectionCategory.Number, SectionCategory.Whitespace)] = +1, // whitespace before number
+                [(SectionCategory.Number, SectionCategory.Whitespace)] = -1, // number before whitespace
                 [(SectionCategory.Number, SectionCategory.Punctuation)] = +1, // number after punctuation
-                
+
                 [(SectionCategory.Text, SectionCategory.Whitespace)] = +1, // whitespace before text
                 [(SectionCategory.Text, SectionCategory.Punctuation)] = -1, // text before punctuation
-                
+
                 [(SectionCategory.Whitespace, SectionCategory.Punctuation)] = +1, // punctuation before whitespace
             };
 
@@ -63,6 +63,7 @@ namespace Naturally
             foreach (var digit in digits)
             {
                 var numericValue = Char.GetNumericValue(digit);
+
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (numericValue != -1)
                     _DigitValue[digit] = numericValue;
@@ -83,21 +84,23 @@ namespace Naturally
         {
             if (ReferenceEquals(x, y))
                 return 0;
+
             if (x == null)
                 return -1;
+
             if (y == null)
                 return +1;
-            
+
             ReadOnlySpan<char> xs = x.AsSpan();
             ReadOnlySpan<char> ys = y.AsSpan();
-            
+
             xs = Trim(xs, out var xLeadingWhitespace, out var xTrailingWhitespace);
             ys = Trim(ys, out var yLeadingWhiteswpace, out var yTrailingWhitespace);
-            
+
             var result = CompareSection(xs, ys);
             if (result != 0)
                 return result;
-            
+
             // leading whitespace after non-leading whitespace
             if (xLeadingWhitespace && !yLeadingWhiteswpace)
                 return +1;
@@ -156,6 +159,35 @@ namespace Naturally
                 xs = MoveNext(xs, out ReadOnlySpan<char> xSection, out SectionCategory xSectionCategory);
                 ys = MoveNext(ys, out ReadOnlySpan<char> ySection, out SectionCategory ySectionCategory);
 
+                if (xSectionCategory == SectionCategory.Whitespace && ySectionCategory == SectionCategory.Number)
+                {
+                    ReadOnlySpan<char> nextXs = MoveNext(xs, out ReadOnlySpan<char> xNextSection, out SectionCategory xNextSectionCategory);
+                    if (xNextSectionCategory == SectionCategory.Number)
+                    {
+                        sortOrderBecauseOfNumericLengthOrLeadingOrTrailingSpaces ??=
+                            _SectionDifferencesResults[(SectionCategory.Whitespace, SectionCategory.Number)];
+
+                        xs = nextXs;
+                        xSection = xNextSection;
+                        xSectionCategory = xNextSectionCategory;
+                    }
+                }
+
+                if (ySectionCategory == SectionCategory.Whitespace && xSectionCategory == SectionCategory.Number)
+                {
+                    ReadOnlySpan<char> nextYs = MoveNext(ys, out ReadOnlySpan<char> yNextSection, out SectionCategory yNextSectionCategory);
+                    if (yNextSectionCategory == SectionCategory.Number)
+                    {
+                        sortOrderBecauseOfNumericLengthOrLeadingOrTrailingSpaces ??=
+                            _SectionDifferencesResults[(SectionCategory.Number, SectionCategory.Whitespace)];
+
+                        ;
+                        ys = nextYs;
+                        ySection = yNextSection;
+                        ySectionCategory = yNextSectionCategory;
+                    }
+                }
+
                 if (xSectionCategory == ySectionCategory)
                 {
                     switch (xSectionCategory)
@@ -172,8 +204,9 @@ namespace Naturally
                             var textComparisonResult = CompareTextSections(xSection, ySection);
                             if (textComparisonResult != 0)
                                 return textComparisonResult;
+
                             break;
-                        
+
                         case SectionCategory.Number:
                             var numericComparisonResult = CompareNumericSections(xSection, ySection);
                             if (numericComparisonResult != 0)
@@ -181,7 +214,7 @@ namespace Naturally
 
                             sortOrderBecauseOfNumericLengthOrLeadingOrTrailingSpaces ??= xSection.Length.CompareTo(ySection.Length);
                             break;
-                        
+
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
@@ -202,7 +235,8 @@ namespace Naturally
             return sortOrderBecauseOfNumericLengthOrLeadingOrTrailingSpaces ?? 0;
         }
 
-        private int CompareTextSections(in ReadOnlySpan<char> x, in ReadOnlySpan<char> y) => _TextStringComparer.Compare(x.ToString(), y.ToString());
+        private int CompareTextSections(in ReadOnlySpan<char> x, in ReadOnlySpan<char> y)
+            => _TextStringComparer.Compare(x.ToString(), y.ToString());
 
         private int CompareNumericSections(in ReadOnlySpan<char> x, in ReadOnlySpan<char> y)
         {
@@ -224,6 +258,7 @@ namespace Naturally
                 {
                     if (!_DigitValue.TryGetValue(xNumber[index], out var xValue))
                         throw new InvalidOperationException($"Internal error, unknown digit '{xNumber[index]}'");
+
                     if (!_DigitValue.TryGetValue(yNumber[index], out var yValue))
                         throw new InvalidOperationException($"Internal error, unknown digit '{yNumber[index]}'");
 
@@ -244,7 +279,7 @@ namespace Naturally
             {
                 if (!_DigitValue.TryGetValue(digit, out var order))
                     throw new InvalidOperationException($"Internal error, unknown digit '{digit}'");
-                
+
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (order != 0.0)
                     return true;
