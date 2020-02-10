@@ -6,6 +6,24 @@ namespace Naturally
 {
     public class NaturalSortOrderStringComparer : StringComparer
     {
+        public static new readonly StringComparer CurrentCulture =
+            new NaturalSortOrderStringComparer(StringComparer.CurrentCulture);
+
+        public static new readonly StringComparer CurrentCultureIgnoreCase =
+            new NaturalSortOrderStringComparer(StringComparer.CurrentCultureIgnoreCase);
+
+        public static new readonly StringComparer InvariantCultureIgnoreCase =
+            new NaturalSortOrderStringComparer(StringComparer.InvariantCultureIgnoreCase);
+
+        public static new readonly StringComparer InvariantCulture =
+            new NaturalSortOrderStringComparer(StringComparer.InvariantCulture);
+        
+        public static new readonly StringComparer Ordinal =
+            new NaturalSortOrderStringComparer(StringComparer.Ordinal);
+        
+        public static new readonly StringComparer OrdinalIgnoreCase =
+            new NaturalSortOrderStringComparer(StringComparer.OrdinalIgnoreCase);
+        
         private static readonly Dictionary<char, double> _DigitValue = new Dictionary<char, double>();
 
         private static readonly Dictionary<(SectionCategory x, SectionCategory y), int> _SectionDifferencesResults =
