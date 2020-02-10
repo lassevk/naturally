@@ -8,11 +8,13 @@ namespace Naturally
 #if DEBUG
         static NaturalSortOrderTables()
         {
+            // This method will flag future changes to numeric values in unicode table
+
             for (var index = 0; index < 65536; index++)
             {
                 var c = (char)index;
                 var value = Char.GetNumericValue(c);
-                
+
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (value == -1)
                 {
@@ -22,7 +24,15 @@ namespace Naturally
                 else
                 {
                     if (!NumericValues.ContainsKey(c))
-                        throw new InvalidOperationException($"Lookup table does not contain value for {index:X4}, but it should, value is {value:R19}");
+                        throw new InvalidOperationException(
+                            $"Lookup table does not contain value for {index:X4}, but it should, value is {value:R19}");
+
+                    var existingValue = NumericValues[c];
+
+                    // ReSharper disable once CompareOfFloatsByEqualityOperator
+                    if (existingValue != value)
+                        throw new InvalidOperationException(
+                            $"Lookup table contains the wrong value for {index:X4}, reported value from .NET is {value:R19}, dictionary contains {existingValue:R19}");
                 }
             }
         }
