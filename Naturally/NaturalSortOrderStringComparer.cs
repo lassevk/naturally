@@ -141,9 +141,9 @@ namespace Naturally
 
                 if (xSectionCategory == SectionCategory.Whitespace && ySectionCategory == SectionCategory.Number)
                 {
-                    ReadOnlySpan<char> nextXs = MoveNext(xs, out ReadOnlySpan<char> xNextSection, out SectionCategory xNextSectionCategory);
-                    if (xNextSectionCategory == SectionCategory.Number)
+                    if (xs.Length > 0 && Categorize(xs[0]) == SectionCategory.Number)
                     {
+                        ReadOnlySpan<char> nextXs = MoveNext(xs, out ReadOnlySpan<char> xNextSection, out SectionCategory xNextSectionCategory);
                         sortOrderBecauseOfNumericLengthOrLeadingOrTrailingSpaces ??=
                             SectionCategory.Whitespace.CompareTo(SectionCategory.Number);
 
@@ -155,9 +155,9 @@ namespace Naturally
 
                 if (ySectionCategory == SectionCategory.Whitespace && xSectionCategory == SectionCategory.Number)
                 {
-                    ReadOnlySpan<char> nextYs = MoveNext(ys, out ReadOnlySpan<char> yNextSection, out SectionCategory yNextSectionCategory);
-                    if (yNextSectionCategory == SectionCategory.Number)
+                    if (ys.Length > 0 && Categorize(ys[0]) == SectionCategory.Number)
                     {
+                        ReadOnlySpan<char> nextYs = MoveNext(ys, out ReadOnlySpan<char> yNextSection, out SectionCategory yNextSectionCategory);
                         sortOrderBecauseOfNumericLengthOrLeadingOrTrailingSpaces ??=
                             SectionCategory.Number.CompareTo(SectionCategory.Whitespace);
 
