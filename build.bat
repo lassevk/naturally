@@ -23,14 +23,13 @@ if not "%GITBRANCH%" == "master" (
     set SUFFIX=beta
 )
 
-
 dotnet restore
 if errorlevel 1 goto error
 
 dotnet build /p:VERSIONSUFFIX=%SUFFIX%
 if errorlevel 1 goto error
 
-dotnet test
+dotnet test /p:VERSIONSUFFIX=%SUFFIX%
 if errorlevel 1 goto error
 
 for /d %%f in (*.*) do (
