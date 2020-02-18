@@ -11,9 +11,11 @@ namespace Naturally
         public static new readonly StringComparer CurrentCultureIgnoreCase =
             new NaturalSortOrderStringComparer();
 
+#if !NETSTANDARD1_6
         [PublicAPI]
         public static new readonly StringComparer InvariantCultureIgnoreCase =
             new NaturalSortOrderStringComparer(StringComparison.InvariantCultureIgnoreCase);
+#endif
 
         #region These added just to make sure NaturalSortOrderStringComparer.XYZ produces the expected results
         
@@ -21,9 +23,11 @@ namespace Naturally
         public static new readonly StringComparer CurrentCulture =
             new NaturalSortOrderStringComparer(StringComparison.CurrentCulture);
 
+#if !NETSTANDARD1_6
         [PublicAPI]
         public static new readonly StringComparer InvariantCulture =
             new NaturalSortOrderStringComparer(StringComparison.InvariantCulture);
+#endif
         
         [PublicAPI]
         public static new readonly StringComparer Ordinal =
