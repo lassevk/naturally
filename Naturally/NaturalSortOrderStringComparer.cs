@@ -1,26 +1,35 @@
 ﻿using System;
 
+using JetBrains.Annotations;
+
 namespace Naturally
 {
+    [PublicAPI]
     public class NaturalSortOrderStringComparer : StringComparer
     {
+        [PublicAPI]
         public static new readonly StringComparer CurrentCultureIgnoreCase =
             new NaturalSortOrderStringComparer();
 
+        [PublicAPI]
         public static new readonly StringComparer InvariantCultureIgnoreCase =
             new NaturalSortOrderStringComparer(StringComparison.InvariantCultureIgnoreCase);
 
         #region These added just to make sure NaturalSortOrderStringComparer.XYZ produces the expected results
         
+        [PublicAPI]
         public static new readonly StringComparer CurrentCulture =
             new NaturalSortOrderStringComparer(StringComparison.CurrentCulture);
 
+        [PublicAPI]
         public static new readonly StringComparer InvariantCulture =
             new NaturalSortOrderStringComparer(StringComparison.InvariantCulture);
         
+        [PublicAPI]
         public static new readonly StringComparer Ordinal =
             new NaturalSortOrderStringComparer(StringComparison.Ordinal);
         
+        [PublicAPI]
         public static new readonly StringComparer OrdinalIgnoreCase =
             new NaturalSortOrderStringComparer(StringComparison.OrdinalIgnoreCase);
         
@@ -29,6 +38,7 @@ namespace Naturally
         private readonly StringComparison _StringComparison;
         private readonly StringComparison _OrdinalStringComparison;
 
+        [PublicAPI]
         public NaturalSortOrderStringComparer(StringComparison stringComparison = StringComparison.CurrentCultureIgnoreCase)
         {
             _StringComparison = stringComparison;
@@ -44,9 +54,12 @@ namespace Naturally
             };
         }
 
+        [PublicAPI]
         public override bool Equals(string x, string y) => Compare(x, y) == 0;
+        [PublicAPI]
         public override int GetHashCode(string obj) => throw new NotSupportedException();
 
+        [PublicAPI]
         public override int Compare(string x, string y)
         {
             if (ReferenceEquals(x, y))
@@ -226,11 +239,8 @@ namespace Naturally
                 ReadOnlySpan<char> yNumber = y[^restLength..];
                 for (int index = 0; index < restLength; index++)
                 {
-                    if (!NaturalSortOrderTables.NumericValues.TryGetValue(xNumber[index], out double xValue))
-                        throw new InvalidOperationException($"Internal error, unknown digit '{xNumber[index]}'");
-
-                    if (!NaturalSortOrderTables.NumericValues.TryGetValue(yNumber[index], out double yValue))
-                        throw new InvalidOperationException($"Internal error, unknown digit '{yNumber[index]}'");
+                    double xValue = Char.GetNumericValue(xNumber[index]);
+                    double yValue = Char.GetNumericValue(yNumber[index]);
 
                     int result = xValue.CompareTo(yValue);
                     if (result != 0)
@@ -247,10 +257,8 @@ namespace Naturally
         {
             foreach (char digit in number)
             {
-                NaturalSortOrderTables.NumericValues.TryGetValue(digit, out double value);
-
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
-                if (value != 0.0)
+                if (Char.GetNumericValue(digit) != 0.0)
                     return true;
             }
 
@@ -280,7 +288,7 @@ namespace Naturally
 
         private static SectionCategory Categorize(char c)
         {
-            if (NaturalSortOrderTables.NumericValues.ContainsKey(c))
+            if (Char.IsDigit(c))
                 return SectionCategory.Number;
 
             if (Char.IsWhiteSpace(c))
