@@ -17,6 +17,7 @@
         <AssemblyOriginatorKeyFile>Naturally.snk</AssemblyOriginatorKeyFile>
         <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
         <LangVersion>8</LangVersion>
+        <PackageVersion>1.0.1</PackageVersion>
     </PropertyGroup>
 
     <ItemGroup>
