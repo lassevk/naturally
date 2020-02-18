@@ -11,9 +11,11 @@ namespace Naturally
         public static new readonly StringComparer CurrentCultureIgnoreCase =
             new NaturalSortOrderStringComparer();
 
+#if !NETSTANDARD1_6
         [PublicAPI]
         public static new readonly StringComparer InvariantCultureIgnoreCase =
             new NaturalSortOrderStringComparer(StringComparison.InvariantCultureIgnoreCase);
+#endif
 
         #region These added just to make sure NaturalSortOrderStringComparer.XYZ produces the expected results
         
@@ -21,9 +23,11 @@ namespace Naturally
         public static new readonly StringComparer CurrentCulture =
             new NaturalSortOrderStringComparer(StringComparison.CurrentCulture);
 
+#if !NETSTANDARD1_6
         [PublicAPI]
         public static new readonly StringComparer InvariantCulture =
             new NaturalSortOrderStringComparer(StringComparison.InvariantCulture);
+#endif
         
         [PublicAPI]
         public static new readonly StringComparer Ordinal =
@@ -101,14 +105,14 @@ namespace Naturally
             if (leadingWhitespace)
             {
                 while (text.Length > 0 && Categorize(text[0]) == SectionCategory.Whitespace)
-                    text = text[1..];
+                    text = text.Slice(1);
             }
 
-            trailingWhitespace = text.Length > 0 && Categorize(text[^1]) == SectionCategory.Whitespace;
+            trailingWhitespace = text.Length > 0 && Categorize(text[text.Length - 1]) == SectionCategory.Whitespace;
             if (trailingWhitespace)
             {
-                while (text.Length > 0 && Categorize(text[^1]) == SectionCategory.Whitespace)
-                    text = text[..^1];
+                while (text.Length > 0 && Categorize(text[text.Length - 1]) == SectionCategory.Whitespace)
+                    text = text.Slice(0, text.Length - 1);
             }
 
             return text;
@@ -217,8 +221,8 @@ namespace Naturally
 
                 int restLength = Math.Min(x.Length, y.Length);
 
-                ReadOnlySpan<char> xNumber = x[^restLength..];
-                ReadOnlySpan<char> yNumber = y[^restLength..];
+                ReadOnlySpan<char> xNumber = x.Slice(x.Length - restLength);
+                ReadOnlySpan<char> yNumber = y.Slice(y.Length - restLength);
                 for (int index = 0; index < restLength; index++)
                 {
                     double xValue = Char.GetNumericValue(xNumber[index]);

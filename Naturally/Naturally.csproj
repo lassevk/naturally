@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFrameworks>netstandard1.6;netstandard2.0;netstandard2.1</TargetFrameworks>
         <PackageId>lvk.naturally</PackageId>
         <Title>Naturally</Title>
         <Authors>Lasse Vågsæther Karlsen</Authors>
@@ -16,10 +16,12 @@
         <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile>Naturally.snk</AssemblyOriginatorKeyFile>
         <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+        <LangVersion>8</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="JetBrains.Annotations" Version="2019.1.3" PrivateAssets="all" />
+      <PackageReference Include="System.Memory" Version="4.5.3" Condition="'$(TargetFramework)' != 'netstandard2.1'" />
     </ItemGroup>
 
     <ItemGroup>
