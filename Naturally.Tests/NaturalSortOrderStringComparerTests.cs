@@ -8,9 +8,9 @@ namespace Naturally.Tests
     [TestFixture]
     public class NaturalSortOrderStringComparerTests
     {
-        public static IEnumerable<TestCaseData> Compare_TestCases()
+        private static IEnumerable<TestCaseData> Compare_TestCases()
         {
-            var sc = StringComparison.InvariantCultureIgnoreCase;
+            StringComparison sc = StringComparison.InvariantCultureIgnoreCase;
             
             yield return new TestCaseData(null, null, sc, 0).SetName("null equals null");
             yield return new TestCaseData(null, "", sc, -1).SetName("null before empty string");
@@ -53,16 +53,16 @@ namespace Naturally.Tests
             yield return new TestCaseData("A10", "A 11", sc, -1).SetName("Ignore whitespace before numbers if numbers make a difference #2");
             yield return new TestCaseData("A10", "A 10", sc, -1).SetName("Do not ignore whitespace before numbers when numbers don't make a difference");
 
-            yield return new TestCaseData("ss", "\u00df", sc, -1).SetName("ss after \u00df");
-            yield return new TestCaseData("\u00df", "ss", sc, +1).SetName("\u00df before ss");
+            yield return new TestCaseData("ss", "\u00df", sc, 0).SetName("ss equal to \u00df");
+            yield return new TestCaseData("\u00df", "ss", sc, 0).SetName("\u00df equal to ss");
         }
 
         [TestCaseSource(nameof(Compare_TestCases))]
         public void Compare_WithTestCases_ReturnsExpectedResults(string a, string b, StringComparison comparison, int expected)
         {
-            var comparer = new NaturalSortOrderStringComparer(comparison);
+            NaturalSortOrderStringComparer comparer = new NaturalSortOrderStringComparer(comparison);
 
-            var output = comparer.Compare(a, b);
+            int output = comparer.Compare(a, b);
 
             Assert.That(output, Is.EqualTo(expected));
 

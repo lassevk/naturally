@@ -36,22 +36,11 @@ namespace Naturally
         #endregion
         
         private readonly StringComparison _StringComparison;
-        private readonly StringComparison _OrdinalStringComparison;
 
         [PublicAPI]
         public NaturalSortOrderStringComparer(StringComparison stringComparison = StringComparison.CurrentCultureIgnoreCase)
         {
             _StringComparison = stringComparison;
-            _OrdinalStringComparison = stringComparison switch
-            {
-                StringComparison.CurrentCulture => StringComparison.Ordinal,
-                StringComparison.CurrentCultureIgnoreCase => StringComparison.OrdinalIgnoreCase,
-                StringComparison.InvariantCulture => StringComparison.Ordinal,
-                StringComparison.InvariantCultureIgnoreCase => StringComparison.OrdinalIgnoreCase,
-                StringComparison.Ordinal => StringComparison.Ordinal,
-                StringComparison.OrdinalIgnoreCase => StringComparison.OrdinalIgnoreCase,
-                _ => throw new ArgumentOutOfRangeException(nameof(stringComparison), stringComparison, null)
-            };
         }
 
         [PublicAPI]
@@ -212,14 +201,7 @@ namespace Naturally
             return sortOrderBecauseOfNumericLengthOrLeadingOrTrailingSpaces ?? 0;
         }
 
-        private int CompareTextSections(in ReadOnlySpan<char> x, in ReadOnlySpan<char> y)
-        {
-            int result = x.CompareTo(y, _StringComparison);
-            if (result != 0 || _StringComparison == _OrdinalStringComparison)
-                return result;
-
-            return x.CompareTo(y, _OrdinalStringComparison);
-        }
+        private int CompareTextSections(in ReadOnlySpan<char> x, in ReadOnlySpan<char> y) => x.CompareTo(y, _StringComparison);
 
         private int CompareNumericSections(in ReadOnlySpan<char> x, in ReadOnlySpan<char> y)
         {
