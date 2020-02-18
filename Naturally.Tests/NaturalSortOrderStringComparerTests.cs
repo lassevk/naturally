@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 using NUnit.Framework;
 
@@ -71,6 +72,32 @@ namespace Naturally.Tests
                 output = comparer.Compare(b, a);
                 Assert.That(output, Is.EqualTo(-expected), "Stability-check");
             }
+        }
+
+        [Test]
+        public void Fuzzing()
+        {
+            Random r = new Random(12345);
+
+            string randomText()
+            {
+                StringBuilder sb = new StringBuilder();
+                for (int index = 0; index < r.Next(50) + 1; index++)
+                    sb.Append((char)r.Next(65536));
+
+                return sb.ToString();
+            }
+
+            List<string> strings = new List<string> { null, "", "a", "aaaaaaaaaaaaaaaaaaaa" };
+            for (int index = 0; index < 1000; index++)
+                strings.Add(randomText());
+            
+            foreach (string x in strings)
+                foreach (string y in strings)
+                {
+                    int result = NaturalSortOrderStringComparer.InvariantCultureIgnoreCase.Compare(x, y);
+                    Assert.That(result >= -1 && result <= 1);
+                }
         }
     }
 }
