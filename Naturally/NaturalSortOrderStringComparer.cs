@@ -202,7 +202,7 @@ namespace Naturally
         private int CompareTextSections(in ReadOnlySpan<char> x, in ReadOnlySpan<char> y)
         {
             int result = x.CompareTo(y, _StringComparison);
-            if (result != 0)
+            if (result != 0 || _StringComparison == _OrdinalStringComparison)
                 return result;
 
             return x.CompareTo(y, _OrdinalStringComparison);
