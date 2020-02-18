@@ -101,14 +101,14 @@ namespace Naturally
             if (leadingWhitespace)
             {
                 while (text.Length > 0 && Categorize(text[0]) == SectionCategory.Whitespace)
-                    text = text[1..];
+                    text = text.Slice(1);
             }
 
-            trailingWhitespace = text.Length > 0 && Categorize(text[^1]) == SectionCategory.Whitespace;
+            trailingWhitespace = text.Length > 0 && Categorize(text[text.Length - 1]) == SectionCategory.Whitespace;
             if (trailingWhitespace)
             {
-                while (text.Length > 0 && Categorize(text[^1]) == SectionCategory.Whitespace)
-                    text = text[..^1];
+                while (text.Length > 0 && Categorize(text[text.Length - 1]) == SectionCategory.Whitespace)
+                    text = text.Slice(0, text.Length - 1);
             }
 
             return text;
@@ -217,8 +217,8 @@ namespace Naturally
 
                 int restLength = Math.Min(x.Length, y.Length);
 
-                ReadOnlySpan<char> xNumber = x[^restLength..];
-                ReadOnlySpan<char> yNumber = y[^restLength..];
+                ReadOnlySpan<char> xNumber = x.Slice(x.Length - restLength);
+                ReadOnlySpan<char> yNumber = y.Slice(y.Length - restLength);
                 for (int index = 0; index < restLength; index++)
                 {
                     double xValue = Char.GetNumericValue(xNumber[index]);
