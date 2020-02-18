@@ -1,5 +1,7 @@
 # Naturally
 
+![.NET Core](https://github.com/lassevk/naturally/workflows/.NET%20Core/badge.svg)
+
 Natural sorting order library for .NET Standard
 
 The library adds a `StringComparer` that implement the following rules:
