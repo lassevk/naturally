@@ -5,7 +5,7 @@ namespace Naturally
     public class NaturalSortOrderStringComparer : StringComparer
     {
         public static new readonly StringComparer CurrentCultureIgnoreCase =
-            new NaturalSortOrderStringComparer(StringComparison.CurrentCultureIgnoreCase);
+            new NaturalSortOrderStringComparer();
 
         public static new readonly StringComparer InvariantCultureIgnoreCase =
             new NaturalSortOrderStringComparer(StringComparison.InvariantCultureIgnoreCase);
@@ -61,10 +61,10 @@ namespace Naturally
             ReadOnlySpan<char> xs = x.AsSpan();
             ReadOnlySpan<char> ys = y.AsSpan();
 
-            xs = Trim(xs, out var xLeadingWhitespace, out var xTrailingWhitespace);
-            ys = Trim(ys, out var yLeadingWhiteswpace, out var yTrailingWhitespace);
+            xs = Trim(xs, out bool xLeadingWhitespace, out bool xTrailingWhitespace);
+            ys = Trim(ys, out bool yLeadingWhiteswpace, out bool yTrailingWhitespace);
 
-            var result = CompareSection(xs, ys);
+            int result = CompareSection(xs, ys);
             if (result != 0)
                 return result;
 
@@ -119,8 +119,8 @@ namespace Naturally
             while (xs.Length > 0 || ys.Length > 0)
             {
 #if DEBUG
-                var xLoopLength = xs.Length;
-                var yLoopLength = ys.Length;
+                int xLoopLength = xs.Length;
+                int yLoopLength = ys.Length;
 #endif
 
                 xs = MoveNext(xs, out ReadOnlySpan<char> xSection, out SectionCategory xSectionCategory);
@@ -167,14 +167,14 @@ namespace Naturally
 
                         case SectionCategory.Text:
                         case SectionCategory.Punctuation:
-                            var textComparisonResult = CompareTextSections(xSection, ySection);
+                            int textComparisonResult = CompareTextSections(xSection, ySection);
                             if (textComparisonResult != 0)
                                 return textComparisonResult;
 
                             break;
 
                         case SectionCategory.Number:
-                            var numericComparisonResult = CompareNumericSections(xSection, ySection);
+                            int numericComparisonResult = CompareNumericSections(xSection, ySection);
                             if (numericComparisonResult != 0)
                                 return numericComparisonResult;
 
@@ -220,19 +220,19 @@ namespace Naturally
                 else if (IsNonZero(y.Slice(0, y.Length - x.Length)))
                     return -1;
 
-                var restLength = Math.Min(x.Length, y.Length);
+                int restLength = Math.Min(x.Length, y.Length);
 
                 ReadOnlySpan<char> xNumber = x[^restLength..];
                 ReadOnlySpan<char> yNumber = y[^restLength..];
-                for (var index = 0; index < restLength; index++)
+                for (int index = 0; index < restLength; index++)
                 {
-                    if (!NaturalSortOrderTables.NumericValues.TryGetValue(xNumber[index], out var xValue))
+                    if (!NaturalSortOrderTables.NumericValues.TryGetValue(xNumber[index], out double xValue))
                         throw new InvalidOperationException($"Internal error, unknown digit '{xNumber[index]}'");
 
-                    if (!NaturalSortOrderTables.NumericValues.TryGetValue(yNumber[index], out var yValue))
+                    if (!NaturalSortOrderTables.NumericValues.TryGetValue(yNumber[index], out double yValue))
                         throw new InvalidOperationException($"Internal error, unknown digit '{yNumber[index]}'");
 
-                    var result = xValue.CompareTo(yValue);
+                    int result = xValue.CompareTo(yValue);
                     if (result != 0)
                         return result;
                 }
@@ -245,9 +245,9 @@ namespace Naturally
 
         private bool IsNonZero(ReadOnlySpan<char> number)
         {
-            foreach (var digit in number)
+            foreach (char digit in number)
             {
-                NaturalSortOrderTables.NumericValues.TryGetValue(digit, out var value);
+                NaturalSortOrderTables.NumericValues.TryGetValue(digit, out double value);
 
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (value != 0.0)
@@ -267,7 +267,7 @@ namespace Naturally
             }
 
             category = Categorize(text[0]);
-            for (var index = 1; index < text.Length; index++)
+            for (int index = 1; index < text.Length; index++)
                 if (Categorize(text[index]) != category)
                 {
                     section = text.Slice(0, index);
