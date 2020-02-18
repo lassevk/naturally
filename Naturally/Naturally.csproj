@@ -10,6 +10,7 @@
         <PackageProjectUrl>https://github.com/lassevk/naturally</PackageProjectUrl>
         <RepositoryUrl>https://github.com/lassevk/naturally.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
 </Project>
