@@ -225,8 +225,8 @@ namespace Naturally
                 ReadOnlySpan<char> yNumber = y.Slice(y.Length - restLength);
                 for (int index = 0; index < restLength; index++)
                 {
-                    double xValue = Char.GetNumericValue(xNumber[index]);
-                    double yValue = Char.GetNumericValue(yNumber[index]);
+                    NaturalSortOrderTables.NumericValues.TryGetValue(xNumber[index], out double xValue);
+                    NaturalSortOrderTables.NumericValues.TryGetValue(yNumber[index], out double yValue);
 
                     int result = xValue.CompareTo(yValue);
                     if (result != 0)
@@ -243,8 +243,11 @@ namespace Naturally
         {
             foreach (char digit in number)
             {
+                if (!NaturalSortOrderTables.NumericValues.TryGetValue(digit, out double value))
+                    continue;
+                
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
-                if (Char.GetNumericValue(digit) != 0.0)
+                if (value != 0.0)
                     return true;
             }
 
@@ -274,7 +277,7 @@ namespace Naturally
 
         private static SectionCategory Categorize(char c)
         {
-            if (Char.IsDigit(c))
+            if (NaturalSortOrderTables.NumericValues.ContainsKey(c))
                 return SectionCategory.Number;
 
             if (Char.IsWhiteSpace(c))

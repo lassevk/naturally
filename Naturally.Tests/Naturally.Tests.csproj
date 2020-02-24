@@ -2,6 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.0</TargetFramework>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>..\Naturally\Naturally.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,6 +15,12 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Naturally\Naturally.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="..\Naturally\Naturally.snk">
+        <Link>Naturally.snk</Link>
+      </None>
     </ItemGroup>
 
 </Project>

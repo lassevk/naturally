@@ -58,3 +58,20 @@ With natural sort order applied, the order becomes more "natural" in terms of wh
     file2.txt
     file10.txt
     file11.txt
+
+### Special features
+
+The natural sort order algorithm implemented by this library is as follows:
+
+* Whitespace does not matter, unless that is the only difference, then less whitespace comes before more whitespace.
+
+    Examples:
+    
+    * `A 10` comes before `A11`
+    * `A10` comes before `A 10`
+    
+    This also includes both leading and trailing whitespace.
+    
+* All unicode characters that are reported by .NET to have a "numerical value" counts towards numerical comparison
+
+    This includes fractions, such as ¾ and ½, which will be sorted correctly, so that `2½ ts sugar` comes before `2¾ ts sugar`

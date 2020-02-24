@@ -1,0 +1,3 @@
+﻿using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Naturally.Tests, PublicKey=002400000480000094000000060200000024000052534131000400000100010045eb7a9110a9c9f7c1830c94417d09e77015ac76ff0dffd1f5af595ac1bb6b4f3fce5baa4a3570fae3e784824ead52b044674ba1db4ffead2e7167ee2454127a0014e2196d78673c28f1af185c0df2ae25ddd08171ca12f100cdbfd079694f9ac306d5d9d6a73c590c41fcc2e025ee28ba7a621cdaa395c29d4f77d35a43cba7                                                                      ")]
