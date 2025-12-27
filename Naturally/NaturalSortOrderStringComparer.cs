@@ -11,11 +11,9 @@ namespace Naturally
         public static new readonly StringComparer CurrentCultureIgnoreCase =
             new NaturalSortOrderStringComparer();
 
-#if !NETSTANDARD1_6
         [PublicAPI]
         public static new readonly StringComparer InvariantCultureIgnoreCase =
             new NaturalSortOrderStringComparer(StringComparison.InvariantCultureIgnoreCase);
-#endif
 
         #region These added just to make sure NaturalSortOrderStringComparer.XYZ produces the expected results
         
@@ -23,11 +21,9 @@ namespace Naturally
         public static new readonly StringComparer CurrentCulture =
             new NaturalSortOrderStringComparer(StringComparison.CurrentCulture);
 
-#if !NETSTANDARD1_6
         [PublicAPI]
         public static new readonly StringComparer InvariantCulture =
             new NaturalSortOrderStringComparer(StringComparison.InvariantCulture);
-#endif
         
         [PublicAPI]
         public static new readonly StringComparer Ordinal =
@@ -42,10 +38,7 @@ namespace Naturally
         private readonly StringComparison _StringComparison;
 
         [PublicAPI]
-        public NaturalSortOrderStringComparer(StringComparison stringComparison = StringComparison.CurrentCultureIgnoreCase)
-        {
-            _StringComparison = stringComparison;
-        }
+        public NaturalSortOrderStringComparer(StringComparison stringComparison = StringComparison.CurrentCultureIgnoreCase) => _StringComparison = stringComparison;
 
         [PublicAPI]
         public override bool Equals(string x, string y) => Compare(x, y) == 0;
@@ -108,10 +101,10 @@ namespace Naturally
                     text = text.Slice(1);
             }
 
-            trailingWhitespace = text.Length > 0 && Categorize(text[text.Length - 1]) == SectionCategory.Whitespace;
+            trailingWhitespace = text.Length > 0 && Categorize(text[^1]) == SectionCategory.Whitespace;
             if (trailingWhitespace)
             {
-                while (text.Length > 0 && Categorize(text[text.Length - 1]) == SectionCategory.Whitespace)
+                while (text.Length > 0 && Categorize(text[^1]) == SectionCategory.Whitespace)
                     text = text.Slice(0, text.Length - 1);
             }
 

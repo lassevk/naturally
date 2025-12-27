@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile>..\Naturally\Naturally.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="JetBrains.Annotations" Version="2019.1.3" />
-      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
-      <PackageReference Include="NUnit" Version="3.12.0" />
-      <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
+      <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+      <PackageReference Include="NUnit" Version="4.4.0" />
+      <PackageReference Include="NUnit3TestAdapter" Version="6.0.1" />
     </ItemGroup>
 
     <ItemGroup>
