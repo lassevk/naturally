@@ -10,9 +10,9 @@ ProjectSection(SolutionItems) = preProject
 	.gitattributes = .gitattributes
 	.gitignore = .gitignore
 	README.md = README.md
-	build.bat = build.bat
-	release.bat = release.bat
 	LICENSE.md = LICENSE.md
+	.github\workflows\build.yml = .github\workflows\build.yml
+	.github\workflows\publish.yml = .github\workflows\publish.yml
 EndProjectSection
 EndProject
 Global

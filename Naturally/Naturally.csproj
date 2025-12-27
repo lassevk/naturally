@@ -10,23 +10,29 @@
         <PackageProjectUrl>https://github.com/lassevk/naturally</PackageProjectUrl>
         <RepositoryUrl>https://github.com/lassevk/naturally.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">True</GeneratePackageOnBuild>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile>Naturally.snk</AssemblyOriginatorKeyFile>
         <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
         <LangVersion>latest</LangVersion>
-        <PackageVersion>1.0.2</PackageVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" PrivateAssets="all" />
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="MinVer" Version="6.1.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
-    <ItemGroup>
-      <None Include="..\LICENSE.md" Pack="true" PackagePath="$(PackageLicenseFile)">
-        <Link>LICENSE.md</Link>
-      </None>
+    <ItemGroup Condition="'$(Configuration)' == 'Release'">
+        <None Include="..\README.md" Pack="true" PackagePath="$(PackageReadmeFile)"/>
+        <None Include="..\LICENSE.md" Pack="true" PackagePath="$(PackageLicenseFile)"/>
     </ItemGroup>
 </Project>
