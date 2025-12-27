@@ -54,9 +54,6 @@ namespace Naturally.Tests
             yield return new TestCaseData("A10", "A 11", sc, -1).SetName("Ignore whitespace before numbers if numbers make a difference #2");
             yield return new TestCaseData("A10", "A 10", sc, -1).SetName("Do not ignore whitespace before numbers when numbers don't make a difference");
 
-            yield return new TestCaseData("ss", "\u00df", sc, 0).SetName("ss equal to \u00df");
-            yield return new TestCaseData("\u00df", "ss", sc, 0).SetName("\u00df equal to ss");
-
             yield return new TestCaseData("\u2153", "4", sc, -1).SetName("1/3 before 4");
             yield return new TestCaseData("\u2153\u2153", "4", sc, +1).SetName("1/3_1/3 after 4");
         }

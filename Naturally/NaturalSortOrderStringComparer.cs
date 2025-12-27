@@ -211,25 +211,23 @@ namespace Naturally
                 }
                 else if (IsNonZero(y[..^x.Length]))
                     return -1;
-
-                int restLength = Math.Min(x.Length, y.Length);
-
-                ReadOnlySpan<char> xNumber = x[^restLength..];
-                ReadOnlySpan<char> yNumber = y[^restLength..];
-                for (int index = 0; index < restLength; index++)
-                {
-                    NaturalSortOrderTables.NumericValues.TryGetValue(xNumber[index], out double xValue);
-                    NaturalSortOrderTables.NumericValues.TryGetValue(yNumber[index], out double yValue);
-
-                    int result = xValue.CompareTo(yValue);
-                    if (result != 0)
-                        return result;
-                }
-
-                return 0;
             }
 
-            return x.CompareTo(y, _StringComparison);
+            int restLength = Math.Min(x.Length, y.Length);
+
+            ReadOnlySpan<char> xNumber = x[^restLength..];
+            ReadOnlySpan<char> yNumber = y[^restLength..];
+            for (int index = 0; index < restLength; index++)
+            {
+                NaturalSortOrderTables.NumericValues.TryGetValue(xNumber[index], out double xValue);
+                NaturalSortOrderTables.NumericValues.TryGetValue(yNumber[index], out double yValue);
+
+                int result = xValue.CompareTo(yValue);
+                if (result != 0)
+                    return result;
+            }
+
+            return 0;
         }
 
         private bool IsNonZero(ReadOnlySpan<char> number)
