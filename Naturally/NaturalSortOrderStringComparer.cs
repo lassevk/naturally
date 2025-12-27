@@ -98,14 +98,14 @@ namespace Naturally
             if (leadingWhitespace)
             {
                 while (text.Length > 0 && Categorize(text[0]) == SectionCategory.Whitespace)
-                    text = text.Slice(1);
+                    text = text[1..];
             }
 
             trailingWhitespace = text.Length > 0 && Categorize(text[^1]) == SectionCategory.Whitespace;
             if (trailingWhitespace)
             {
                 while (text.Length > 0 && Categorize(text[^1]) == SectionCategory.Whitespace)
-                    text = text.Slice(0, text.Length - 1);
+                    text = text[..^1];
             }
 
             return text;
@@ -206,16 +206,16 @@ namespace Naturally
             {
                 if (x.Length > y.Length)
                 {
-                    if (IsNonZero(x.Slice(0, x.Length - y.Length)))
+                    if (IsNonZero(x[..^y.Length]))
                         return 1;
                 }
-                else if (IsNonZero(y.Slice(0, y.Length - x.Length)))
+                else if (IsNonZero(y[..^x.Length]))
                     return -1;
 
                 int restLength = Math.Min(x.Length, y.Length);
 
-                ReadOnlySpan<char> xNumber = x.Slice(x.Length - restLength);
-                ReadOnlySpan<char> yNumber = y.Slice(y.Length - restLength);
+                ReadOnlySpan<char> xNumber = x[^restLength..];
+                ReadOnlySpan<char> yNumber = y[^restLength..];
                 for (int index = 0; index < restLength; index++)
                 {
                     NaturalSortOrderTables.NumericValues.TryGetValue(xNumber[index], out double xValue);
@@ -260,8 +260,8 @@ namespace Naturally
             for (int index = 1; index < text.Length; index++)
                 if (Categorize(text[index]) != category)
                 {
-                    section = text.Slice(0, index);
-                    return text.Slice(index);
+                    section = text[..index];
+                    return text[index..];
                 }
 
             section = text;
