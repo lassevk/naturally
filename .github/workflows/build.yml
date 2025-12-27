@@ -24,6 +24,9 @@ jobs:
           
       - name: 'Test'
         run: dotnet test --configuration Release -p:CollectCoverage=true -p:CoverletOutputFormat=opencover --no-restore --verbosity normal
+        
+      - name: 'Publish?'
+        run: find . -type f -name '*.nupkg'
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
