@@ -29,7 +29,4 @@ jobs:
         run: dotnet test --configuration Release -p:CollectCoverage=true -p:CoverletOutputFormat=opencover --no-restore --verbosity normal
 
       - name: Publish NuGet package
-        run: |
-          foreach ($file in Get-ChildItem -Recurse -Path . -Filter *.nupkg) {
-            dotnet nuget push $file --api-key "${{ secrets.NUGET_PAT }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
-          }
+        run: dotnet nuget push ./Naturally/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_PAT }} --source https://api.nuget.org/v3/index.json --skip-duplicate
