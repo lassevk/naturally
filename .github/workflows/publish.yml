@@ -22,11 +22,11 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
 
-      - name: Build .NET Projects
-        shell: pwsh
-        run: |
-          dotnet build --configuration Release
-          dotnet test --configuration Release
+      - name: 'Build'
+        run: dotnet build --configuration Release
+
+      - name: 'Test'
+        run: dotnet test --configuration Release -p:CollectCoverage=true -p:CoverletOutputFormat=opencover --no-restore --verbosity normal
 
       - name: Publish NuGet package
         run: |
